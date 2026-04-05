@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t spring-app .'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                docker stop spring-container || true
+                docker rm spring-container || true
+                docker run -d -p 8082:8080 --name spring-container spring-app
+                '''
+            }
+        }
+    }
+}
